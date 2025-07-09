@@ -50,21 +50,28 @@
 <body>
     <div class="container">
         <h1>Ambiente de Desenvolvimento Docker</h1>
-        <p>Olá! Seu ambiente com Nginx, PHP, MySQL e Redis está funcionando.</p>
+        <p>Olá! Seu ambiente com Nginx, PHP, MySQL, PostgreSQL e Redis está funcionando.</p>
 
         <h3>Status da Conexão com o MySQL</h3>
         <?php
-        $host = 'db';
-        $dbname = 'meu_banco';
-        $user = 'user';
-        $password = 'user_password';
-
         try {
-            $conn = new PDO("mysql:host=$host;dbname=$dbname", $user, $password);
+            $conn = new PDO("mysql:host=db;dbname=meu_banco_mysql", 'user_mysql', 'user_password_mysql');
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            echo "<p class='status success'>Conexão com o banco de dados '$dbname' bem-sucedida!</p>";
+            echo "<p class='status success'>Conexão com o MySQL bem-sucedida!</p>";
         } catch (PDOException $e) {
             echo "<p class='status error'>Erro na conexão com MySQL: " . $e->getMessage() . "</p>";
+        }
+        ?>
+
+        <h3>Status da Conexão com o PostgreSQL</h3>
+        <?php
+        try {
+            // O nome do host é o nome do serviço: 'postgres'
+            $connPg = new PDO("pgsql:host=postgres;dbname=meu_banco_pg", 'user_pg', 'user_password_pg');
+            $connPg->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            echo "<p class='status success'>Conexão com o PostgreSQL bem-sucedida!</p>";
+        } catch (PDOException $e) {
+            echo "<p class='status error'>Erro na conexão com PostgreSQL: " . $e->getMessage() . "</p>";
         }
         ?>
 
@@ -72,14 +79,10 @@
         <?php
         try {
             $redis = new Redis();
-            // O nome do host é o nome do serviço Redis: 'redis'
             $redis->connect('redis', 6379);
-
-            // Testa a conexão com o comando PING
             $response = $redis->ping();
-
             if ($response == '+PONG' || $response == 'PONG') {
-                echo "<p class='status success'>Conexão com o Redis bem-sucedida! (Resposta: $response)</p>";
+                echo "<p class='status success'>Conexão com o Redis bem-sucedida!</p>";
             } else {
                 echo "<p class='status error'>Resposta inesperada do Redis: " . $response . "</p>";
             }
