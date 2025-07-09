@@ -54,8 +54,14 @@
 
         <h3>Status da Conexão com o MySQL</h3>
         <?php
+        // Lendo as credenciais do MySQL a partir das variáveis de ambiente
+        $db_host_mysql = getenv('DB_HOST_MYSQL');
+        $db_name_mysql = getenv('DB_DATABASE_MYSQL');
+        $db_user_mysql = getenv('DB_USER_MYSQL');
+        $db_pass_mysql = getenv('DB_PASSWORD_MYSQL');
+
         try {
-            $conn = new PDO("mysql:host=db;dbname=meu_banco_mysql", 'user_mysql', 'user_password_mysql');
+            $conn = new PDO("mysql:host=$db_host_mysql;dbname=$db_name_mysql", $db_user_mysql, $db_pass_mysql);
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             echo "<p class='status success'>Conexão com o MySQL bem-sucedida!</p>";
         } catch (PDOException $e) {
@@ -65,9 +71,14 @@
 
         <h3>Status da Conexão com o PostgreSQL</h3>
         <?php
+        // Lendo as credenciais do PostgreSQL a partir das variáveis de ambiente
+        $db_host_pg = getenv('DB_HOST_POSTGRES');
+        $db_name_pg = getenv('DB_DATABASE_POSTGRES');
+        $db_user_pg = getenv('DB_USER_POSTGRES');
+        $db_pass_pg = getenv('DB_PASSWORD_POSTGRES');
+
         try {
-            // O nome do host é o nome do serviço: 'postgres'
-            $connPg = new PDO("pgsql:host=postgres;dbname=meu_banco_pg", 'user_pg', 'user_password_pg');
+            $connPg = new PDO("pgsql:host=$db_host_pg;dbname=$db_name_pg", $db_user_pg, $db_pass_pg);
             $connPg->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             echo "<p class='status success'>Conexão com o PostgreSQL bem-sucedida!</p>";
         } catch (PDOException $e) {
@@ -77,10 +88,15 @@
 
         <h3>Status da Conexão com o Redis</h3>
         <?php
+        // Lendo as credenciais do Redis a partir das variáveis de ambiente
+        $redis_host = getenv('REDIS_HOST');
+        $redis_port = getenv('REDIS_PORT');
+
         try {
             $redis = new Redis();
-            $redis->connect('redis', 6379);
+            $redis->connect($redis_host, $redis_port);
             $response = $redis->ping();
+
             if ($response == '+PONG' || $response == 'PONG') {
                 echo "<p class='status success'>Conexão com o Redis bem-sucedida!</p>";
             } else {

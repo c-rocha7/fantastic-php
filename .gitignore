@@ -1,0 +1,6 @@
+# Ignorar o arquivo de ambiente local
+.env
+
+# Ignorar pastas de dependências
+/vendor
+/node_modules

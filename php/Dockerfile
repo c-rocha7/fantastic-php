@@ -1,4 +1,4 @@
-# Use a imagem oficial do PHP com FPM como base
+# Imagem oficial do PHP com FPM-Alpine
 FROM php:8.2-fpm-alpine
 
 # Instala as dependências do sistema necessárias para as extensões

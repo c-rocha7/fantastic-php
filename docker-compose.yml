@@ -1,74 +1,86 @@
-# Definição dos serviços (contêineres)
 services:
 
-  # Serviço: Nginx (Servidor Web)
   nginx:
     image: nginx:stable-alpine
     container_name: nginx_server
     ports:
-      - "80:80"
+      - "${NGINX_PORT:-8000}:80"
     volumes:
       - ./src:/var/www/html
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - php
-      - db
-      - postgres # Adicionada dependência do PostgreSQL
+      - mysql
+      - postgres
     deploy:
       resources:
         limits:
-          cpus: '0.25' # Limita a, no máximo, 25% de um núcleo de CPU
-          memory: 128M # Limita a, no máximo, 128 Megabytes de RAM
-  # Serviço: PHP-FPM (Processador PHP)
+          cpus: '0.25'
+          memory: 128M
+
   php:
     build: ./php
-    container_name: php_fpm_processor
+    container_name: php_fpm
+    user: "${PUID:-1000}:${PGID:-1000}"
     volumes:
       - ./src:/var/www/html
+    environment:
+      # Variáveis para a conexão MySQL
+      DB_HOST_MYSQL: 'mysql'
+      DB_DATABASE_MYSQL: '${MYSQL_DATABASE}'
+      DB_USER_MYSQL: '${MYSQL_USER}'
+      DB_PASSWORD_MYSQL: '${MYSQL_PASSWORD}'
+
+      # Variáveis para a conexão PostgreSQL
+      DB_HOST_POSTGRES: 'postgres'
+      DB_DATABASE_POSTGRES: '${POSTGRES_DATABASE}'
+      DB_USER_POSTGRES: '${POSTGRES_USER}'
+      DB_PASSWORD_POSTGRES: '${POSTGRES_PASSWORD}'
+
+      # Variáveis para a conexão Redis
+      REDIS_HOST: 'redis'
+      REDIS_PORT: 6379
     depends_on:
       - redis
-      - db
-      - postgres # Adicionada dependência do PostgreSQL
+      - mysql
+      - postgres
     deploy:
       resources:
         limits:
-          cpus: '0.50' # Limita a, no máximo, 50% de um núcleo de CPU
-          memory: 256M # Limita a, no máximo, 256 Megabytes de RAM
+          cpus: '0.50'
+          memory: 256M
 
-  # Serviço: Banco de Dados MySQL
-  db:
+  mysql:
     image: mysql:8.0
     container_name: mysql_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 'root_password'
-      MYSQL_DATABASE: 'meu_banco_mysql'
-      MYSQL_USER: 'user_mysql'
-      MYSQL_PASSWORD: 'user_password_mysql'
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD:-root}'
+      MYSQL_DATABASE: '${MYSQL_DATABASE:-db_mysql}'
+      MYSQL_USER: '${MYSQL_USER:-user}'
+      MYSQL_PASSWORD: '${MYSQL_PASSWORD:-password}'
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT:-3306}:3306"
     volumes:
       - db-data:/var/lib/mysql
     deploy:
       resources:
         limits:
           cpus: '0.50'
-          memory: 512M # Bancos de dados podem usar mais memória
+          memory: 512M
         reservations:
-          memory: 256M # Garante que o MySQL sempre tenha 256M disponíveis
+          memory: 256M
 
-  # Serviço: Banco de Dados PostgreSQL
   postgres:
     image: postgres:15-alpine
     container_name: postgres_db
     restart: always
     environment:
-      POSTGRES_DB: 'meu_banco_pg'
-      POSTGRES_USER: 'user_pg'
-      POSTGRES_PASSWORD: 'user_password_pg'
+      POSTGRES_DB: '${POSTGRES_DATABASE:-db_postgres}'
+      POSTGRES_USER: '${POSTGRES_USER:-user}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-password}'
     ports:
-      # Expõe a porta 5432 do contêiner na porta 5432 da sua máquina
-      - "5432:5432"
+      - "${POSGRES_PORT:-5432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     deploy:
@@ -79,27 +91,23 @@ services:
         reservations:
           memory: 256M
 
-  # Serviço: Adminer (Interface Web para Bancos de Dados)
   adminer:
     image: adminer
     container_name: adminer_ui
     restart: always
     ports:
-      # Expõe a porta 8080 do contêiner na porta 8080 da sua máquina
-      - "8080:8080"
+      - "${ADMINER_PORT:-8080}:8080"
     deploy:
       resources:
         limits:
           cpus: '0.25'
           memory: 128M
 
-  # Serviço: Redis
   redis:
     image: redis:alpine
     container_name: redis_cache
     restart: always
     volumes:
-      # Persiste os dados do Redis em um volume nomeado
       - redis-data:/data
     deploy:
       resources:
@@ -109,17 +117,13 @@ services:
         reservations:
           memory: 128M
 
-  # Serviço: Redis Commander (Interface Web para Redis)
   redis-commander:
     image: rediscommander/redis-commander:latest
     container_name: redis_commander_ui
     restart: always
     ports:
-      # Expõe a porta 8081 do contêiner na porta 8082 da sua máquina
-      - "8082:8081"
+      - "${REDIS_COMMANDER_PORT:-8081}:8081"
     environment:
-      # Informa ao Redis Commander como se conectar ao nosso serviço Redis
-      # O formato é 'alias:hostname:porta'
       - REDIS_HOSTS=local:redis:6379
     depends_on:
       - redis
@@ -129,8 +133,7 @@ services:
           cpus: '0.25'
           memory: 128M
 
-# Definição dos volumes nomeados
 volumes:
   db-data:
-  postgres-data: # <-- Novo volume para persistir os dados do PostgreSQL
+  postgres-data:
   redis-data:
