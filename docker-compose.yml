@@ -1,0 +1,56 @@
+# Definição dos serviços (contêineres)
+services:
+
+  # Serviço 1: Banco de Dados MySQL
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root_password' # Senha forte para o usuário root
+      MYSQL_DATABASE: 'meu_banco'          # Nome do banco de dados a ser criado
+      MYSQL_USER: 'user'                   # Nome do usuário
+      MYSQL_PASSWORD: 'user_password'      # Senha do usuário
+    ports:
+      # Expõe a porta 3306 do contêiner na porta 3306 da sua máquina
+      # útil para conectar com um cliente de banco de dados local (ex: DBeaver, HeidiSQL)
+      - "3306:3306"
+    volumes:
+      # Persiste os dados do MySQL em um volume nomeado
+      - db-data:/var/lib/mysql
+
+  # Serviço 2: PHP com Servidor Apache
+  app:
+    # 'build' instrui o Docker a construir a imagem a partir do Dockerfile
+    build:
+      context: ./php # O contexto é a pasta 'php/'
+    container_name: php_app
+    ports:
+      # Expõe a porta 80 do contêiner na porta 8000 da sua máquina
+      - "8000:80"
+    volumes:
+      # Monta a pasta 'src' local no diretório web padrão do Apache no contêiner
+      # Isso permite que você edite o código localmente e veja as alterações ao vivo
+      - ./src:/var/www/html/
+    depends_on:
+      # Garante que o serviço 'db' seja iniciado antes do serviço 'app'
+      - db
+
+  # Serviço 3: phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_ui
+    restart: always
+    ports:
+      # Expõe a porta 80 do contêiner na porta 8081 da sua máquina
+      - "8081:80"
+    environment:
+      # Informa ao phpMyAdmin qual servidor de banco de dados conectar
+      # 'db' é o nome do nosso serviço MySQL definido acima
+      PMA_HOST: db
+    depends_on:
+      - db
+
+# Definição dos volumes nomeados
+volumes:
+  db-data:
