@@ -1,0 +1,74 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+
+# Documentação
+README.md
+LICENSE
+*.md
+docs/
+
+# Arquivos de ambiente e configuração
+.env
+.env.*
+!.env.example
+
+# Dependências e cache
+vendor/
+node_modules/
+composer.lock
+package-lock.json
+yarn.lock
+
+# Logs
+*.log
+logs/
+
+# Cache e arquivos temporários
+.cache/
+.tmp/
+tmp/
+temp/
+
+# IDEs e editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Arquivos de backup
+*.bak
+*.backup
+*.old
+
+# Arquivos de teste
+tests/
+test/
+*.test.php
+phpunit.xml
+phpunit.xml.dist
+
+# Build artifacts
+build/
+dist/
+public/build/
+
+# Arquivos específicos do sistema
+.htaccess
+.htpasswd
+
+# Configurações locais específicas do desenvolvedor
+.editorconfig
+.phpcs.xml
+.php_cs
+.php_cs.cache

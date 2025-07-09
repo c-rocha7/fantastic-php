@@ -1,6 +1,78 @@
-# Ignorar o arquivo de ambiente local
+# Arquivos de ambiente
 .env
+.env.local
+.env.*.local
 
-# Ignorar pastas de dependências
-/vendor
-/node_modules
+# Dependências
+vendor/
+node_modules/
+composer.lock
+
+# Logs
+*.log
+logs/
+storage/logs/
+
+# Cache e arquivos temporários
+.cache/
+.tmp/
+tmp/
+temp/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+
+# IDEs e editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# Sistema operacional
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Docker volumes e dados
+data/
+mysql-data/
+postgres-data/
+redis-data/
+
+# Arquivos de backup
+*.bak
+*.backup
+*.old
+*.orig
+
+# PHP específico
+*.cache
+.php_cs.cache
+.phpunit.result.cache
+
+# Uploads e arquivos temporários
+uploads/
+storage/app/public/uploads/
+public/uploads/
+
+# Certificados SSL (se houver)
+*.pem
+*.key
+*.crt
+*.csr
+
+# Arquivos de configuração local específicos
+config/local/
+.htaccess.local
+
+# Build artifacts
+build/
+dist/
